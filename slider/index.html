@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Slider Demo</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div id="wrap">
+    <div id="slider">
+        <ul>
+            <li><a href="#"><img src="images/1.gif" alt=""></a></li>
+            <li><a href="#"><img src="images/2.gif" alt=""></a></li>
+            <li><a href="#"><img src="images/3.gif" alt=""></a></li>
+            <li><a href="#"><img src="images/4.gif" alt=""></a></li>
+        </ul>
+    </div>
+    <div id="btn">
+        <ul>
+            <li class="active">1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var currntIndex = 1;
+
+    function setSliderIndex(index) {
+        index = index || 1;
+        var top = -((index - 1) * 80);
+        document.querySelector('#slider ul').style.top = top + 'px';
+
+        var btnItems = document.querySelectorAll("#btn li");
+
+        for(var i = 0; i < btnItems.length; i++) {
+            (i+1) === index ? btnItems[i].className = 'active' : btnItems[i].className = '';
+        }
+    }
+
+    function registerEvent() {
+        var btnItems = document.querySelectorAll("#btn li");
+        for(var i = 0; i < btnItems.length; i++) {
+            btnItems[i].addEventListener('click', function(e) {
+                sliderStop();
+
+                var targetIndex = parseInt(e.target.textContent);
+                setSliderIndex(targetIndex);
+                currntIndex = targetIndex;
+
+                sliderStart();
+            }, false);         
+        }
+    }
+
+    function sliderStart() {
+        if(!window.sliderInterval) {
+            currntIndex ++;
+            window.sliderInterval = setInterval(function() {
+                if(currntIndex > 4) currntIndex = 1;
+                setSliderIndex(currntIndex);
+                currntIndex ++;
+            }, 2000);
+        }
+    }
+
+    function sliderStop() {
+        if(window.sliderInterval != null) {
+            clearInterval(window.sliderInterval);
+            window.sliderInterval = null;
+        }
+    }
+
+    window.onload = function() {
+        registerEvent();
+        sliderStart();
+    };
+</script>
+</body>
+</html>
