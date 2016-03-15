@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Slider Demo V3</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div id="wrap">
+    <div id="slider">
+        <ul>
+            <li><a href="{{url}}"><img msrc="{{src}}" alt="{{alt}}"></a></li>
+        </ul>
+    </div>
+    <div id="btn">
+        <ul>
+            <li class="{{class}}">{{index}}</li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var data = [
+        {url: '#', src: 'images/1.gif', alt: 'activity'},
+        {url: '#', src: 'images/2.gif', alt: 'activity'},
+        {url: '#', src: 'images/3.gif', alt: 'activity'},
+        {url: '#', src: 'images/4.gif', alt: 'activity'}
+    ];
+
+
+
+    var Slider = function(seletor, data) {
+        this.el = document.querySelector(seletor);
+        this.currntIndex = 1;
+        this.data = data;
+        this.render(data);
+        this.init();
+    };
+
+    Slider.prototype.init = function() {
+        var self = this;
+        var btnItems = this.el.querySelectorAll("#btn li");
+        for(var i = 0; i < btnItems.length; i++) {
+            btnItems[i].addEventListener('click', function(e) {
+                self.stop();
+
+                var targetIndex = parseInt(e.target.textContent);
+                self.setIndex(targetIndex);
+                self.currntIndex = targetIndex;
+
+                self.play();
+            }, false);         
+        }
+    };
+
+    Slider.prototype.render = function(data) {
+        var _html_slider_li = this.el.querySelector('#slider ul').innerHTML.replace(/(^\s*)|(\s*$)/g, '').replace(/msrc/g, 'src');
+        var _html_btn_li = this.el.querySelector('#btn ul').innerHTML.replace(/(^\s*)|(\s*$)/g, '');
+
+        var _html_slider_ul = this.el.querySelector('#slider ul');
+        var _html_btn_ul = this.el.querySelector('#btn ul');
+
+        _html_slider_ul.innerHTML = '';
+        _html_btn_ul.innerHTML = '';
+
+        data.forEach(function(item, index) {
+            var _html = _html_slider_li.replace(/{{(.+?)}}/g, function (m1, m2) {
+                return item[m2] == null ? m1 : item[m2];
+            });
+            _html_slider_ul.innerHTML += _html;
+
+
+            _html = _html_btn_li.replace(/{{(.+?)}}/g, function(m1, m2) {
+                if(m2 === 'index') return (index+1);
+                if(m2 === 'class' && index === 0) return 'active';  
+                return '';
+            });
+
+            _html_btn_ul.innerHTML += _html;
+        });
+    };
+
+    Slider.prototype.play = function() {
+        var self = this;
+        if(!this.sliderInterval) {
+            this.currntIndex ++;
+            this.sliderInterval = setInterval(function() {
+                if(self.currntIndex > 4) self.currntIndex = 1;
+                self.setIndex(self.currntIndex);
+                self.currntIndex ++;
+            }, 2000);
+        }
+    };
+
+    Slider.prototype.stop = function() {
+        if(this.sliderInterval != null) {
+            clearInterval(this.sliderInterval);
+            this.sliderInterval = null;
+        }       
+    };
+
+    Slider.prototype.setIndex = function(index) {
+        index = index || 1;
+        var top = -((index - 1) * 80);
+        this.el.querySelector('#slider ul').style.top = top + 'px';
+
+        var btnItems = this.el.querySelectorAll("#btn li");
+
+        for(var i = 0; i < btnItems.length; i++) {
+            (i+1) === index ? btnItems[i].className = 'active' : btnItems[i].className = '';
+        }        
+    };
+
+    if(window.addEventListener) {
+        window.addEventListener('load', function() {
+            (new Slider('#wrap', data)).play();
+        }, false);
+    }
+    else if(window.attachEvent) {
+        window.attachEvent('onload', function() {
+            (new Slider('#wrap', data)).play();
+        });
+    }
+    else {    
+        window.onload = function() {
+            (new Slider('#wrap', data)).play();
+        };
+    }
+
+</script>
+</body>
+</html>
