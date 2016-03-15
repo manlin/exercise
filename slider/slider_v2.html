@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Slider Demo V2</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div id="wrap">
+    <div id="slider">
+        <ul>
+            <li><a href="#"><img src="images/1.gif" alt=""></a></li>
+            <li><a href="#"><img src="images/2.gif" alt=""></a></li>
+            <li><a href="#"><img src="images/3.gif" alt=""></a></li>
+            <li><a href="#"><img src="images/4.gif" alt=""></a></li>
+        </ul>
+    </div>
+    <div id="btn">
+        <ul>
+            <li class="active">1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var Slider = function(seletor) {
+        this.el = document.querySelector(seletor);
+        this.currntIndex = 1;
+        this.init();
+    };
+
+    Slider.prototype.init = function() {
+        var self = this;
+        var btnItems = this.el.querySelectorAll("#btn li");
+        for(var i = 0; i < btnItems.length; i++) {
+            btnItems[i].addEventListener('click', function(e) {
+                self.stop();
+
+                var targetIndex = parseInt(e.target.textContent);
+                self.setIndex(targetIndex);
+                self.currntIndex = targetIndex;
+
+                self.play();
+            }, false);         
+        }
+    }
+
+    Slider.prototype.play = function() {
+        var self = this;
+        if(!this.sliderInterval) {
+            this.currntIndex ++;
+            this.sliderInterval = setInterval(function() {
+                if(self.currntIndex > 4) self.currntIndex = 1;
+                self.setIndex(self.currntIndex);
+                self.currntIndex ++;
+            }, 2000);
+        }
+    };
+
+    Slider.prototype.stop = function() {
+        if(this.sliderInterval != null) {
+            clearInterval(this.sliderInterval);
+            this.sliderInterval = null;
+        }       
+    };
+
+    Slider.prototype.setIndex = function(index) {
+        index = index || 1;
+        var top = -((index - 1) * 80);
+        this.el.querySelector('#slider ul').style.top = top + 'px';
+
+        var btnItems = this.el.querySelectorAll("#btn li");
+
+        for(var i = 0; i < btnItems.length; i++) {
+            (i+1) === index ? btnItems[i].className = 'active' : btnItems[i].className = '';
+        }        
+    };
+
+    if(window.addEventListener) {
+        window.addEventListener('load', function() {
+            (new Slider('#wrap')).play();
+        }, false);
+    }
+    else if(window.attchEvent) {
+        window.attchEvent('onload', function() {
+            (new Slider('#wrap')).play();
+        });
+    }
+    else {    
+        window.onload = function() {
+            (new Slider('#wrap')).play();
+        };
+    }
+
+</script>
+</body>
+</html>
